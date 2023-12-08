@@ -6,24 +6,37 @@
 # um output conforme as necessidades postas, sejam elas atividades de manutenção, teste
 # ou atualização do código fonte em questão.
 
-INVENV=$(python -c 'import sys; print("1" if hasattr(sys, "real_prefix") else "0")')
+function echo() {
+    command echo -e "$@"
+}
+
+# verificando uso do python-is-python3.
+# O script é fechado caso nenhuma versão (python ou python-is-python3) seja encontrada 
+# com o comando command.
+if ! command -v python &> /dev/null; then
+    if ! command -v python3 &> /dev/null; then
+        echo "python não encontrado! Fechando o script (code: 1)..."
+        exit 1
+    else
+        PYEXE=`command -v python3`
+    fi
+else
+    PYEXE=`command -v python`
+fi
+echo "[PYEXE] '$PYEXE'"
 
 # Verificando se o script foi executando em um ambiente virtual
-# e realizando um alias caso o sistema não utilize python-is-python3.
+INVENV=`$PYEXE -c 'import sys; print("1" if hasattr(sys, "real_prefix") else "0")'`
+
 if [ $INVENV == 0 ]; then
     echo "virtualenv não detectado!"
-    echo -e "\t\\-> O programa instalará as dependências no sistema,"
-    echo -e "\tutilize um venv caso queira fazer uma instalação local."
-    if ! command -v python &> /dev/null; then
-        echo "Exe. 'python' não encontrado, utilizando alias para 'python3'"
-        alias python='python3'
-    fi
+    echo "\t\\-> O programa instalará as dependências no sistema,"
+    echo "\tutilize um venv caso queira fazer uma instalação local."
 fi
 
-alias pyInst='python -m pip install -U'
+PYINST="$PYEXE -m pip install -U"
 
 help_panel() {
-    alias echo='echo -e'
     echo "PAINEL DE AJUDA:"
     echo "================"
     echo
@@ -46,14 +59,14 @@ build_docs() {
 # software conforme necessário - (fazer mais opções no releasing).
 make_release() {
     # Verificando/Atualizando as dependências
-    pyInst pip
-    pyInst -r requirements.txt
+    $PYINST pip
+    $PYINST -r requirements.txt
 
     # Construíndo a documentação
     build_docs
 
     # pyinstaller - building release
-    pyInst pyinstaller
+    $PYINST pyinstaller
     pyinstaller loveiswar.py
 
     cp -r ./docs/_build/ ./dist/loveiswar/docs/ # add. Documentação
