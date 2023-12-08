@@ -25,11 +25,17 @@ else
 fi
 echo "[PYEXE] '$PYEXE'"
 
+# Armazenando as escape strings de cores do shell
+ESC_RST="\e[0m"
+ESC_RED="\e[1;31m"
+ESC_GREEN="\e[1;32m"
+ESC_BLUE="\e[1;34m"
+
 # Verificando se o script foi executando em um ambiente virtual
 INVENV=`$PYEXE -c 'import sys; print("1" if hasattr(sys, "real_prefix") else "0")'`
 
 if [ $INVENV == 0 ]; then
-    echo "virtualenv não detectado!"
+    echo "$ESC_RED""virtualenv não detectado!$ESC_RST"
     echo "\t\\-> O programa instalará as dependências no sistema,"
     echo "\tutilize um venv caso queira fazer uma instalação local."
 fi
@@ -37,6 +43,7 @@ fi
 PYINST="$PYEXE -m pip install -U"
 
 help_panel() {
+    echo "================"
     echo "PAINEL DE AJUDA:"
     echo "================"
     echo
