@@ -47,8 +47,12 @@ help_panel() {
     echo "PAINEL DE AJUDA:"
     echo "================"
     echo
-    echo "\t-h\t=> Exibe esse painel de ajuda."
-    echo "\t-r\t=> Realiza um empacotamento com o pyinstaller."
+    echo "\t-h/--help\t=> Exibe esse painel de ajuda."
+    echo "\t-r/--release\t=> Realiza um empacotamento com o pyinstaller."
+    echo "\t-ideps/--install-dependencies\t=> Instala/Atualiza as dependências do projeto com o pip."
+    echo "\t-d/--make-docs\t=> Reúne e compila a documentação do código com sphinx."
+    echo "\t-cdocs/--clean-documentation\t=> Remove a documentação gerada pelo sphinx."
+    echo "\t-ccache/--clean-cachefiles\t=> Remove os arquivos de cache do projeto."
     echo "\t"
 }
 
