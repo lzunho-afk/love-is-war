@@ -10,7 +10,7 @@ function echo() {
     command echo -e "$@"
 }
 
-# verificando uso do python-is-python3.
+# verifica o uso do python-is-python3 e armazena o executável do python em $PYEXE.
 # O script é fechado caso nenhuma versão (python ou python-is-python3) seja encontrada 
 # com o comando command.
 if ! command -v python &> /dev/null; then
