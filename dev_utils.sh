@@ -35,9 +35,10 @@ ESC_BLUE="\e[1;34m"
 INVENV=`$PYEXE -c 'import sys; print("1" if hasattr(sys, "real_prefix") else "0")'`
 
 if [ $INVENV == 0 ]; then
-    echo "$ESC_RED""virtualenv não detectado!$ESC_RST"
+    echo "${ESC_RED}virtualenv não detectado!${ESC_RST}"
     echo "\t\\-> O programa instalará as dependências no sistema,"
     echo "\tutilize um venv caso queira fazer uma instalação local."
+    echo
 fi
 
 PYINST="$PYEXE -m pip install -U"
@@ -92,9 +93,29 @@ cmd_args[3]="-d;--make-docs;Reúne e compila a documentação do código com sph
 cmd_args[4]="-cdocs;--clean-documentation;Remove a documentação gerada pelo sphinx"
 cmd_args[5]="-ccache;--clean-cachefiles;Remove os arquivos de cache do projeto"
 
-for arg in "$@"
+# Alerta em caso de mais de um argumento
+if [ $# -gt 2 ];then
+    echo "${ESC_RED}Atenção: Apenas o primeiro argumento será considerado.${ESC_RST}"
+    echo "\\-> Execute uma operação por vez."
+    echo
+    sleep 3
+fi
+
+for arg_idx in `seq 0 $#`
 do
-    if [ "$arg" == "--help" -o "$arg" == "-h" ]; then
-        help_panel "${cmd_args[@]}"
-    fi
+    for cmd_arg_idx in "${!cmd_args[@]}"; do
+        IFS=";" read -r -a split_cmd_arg <<< "${cmd_args[$cmd_arg_idx]}"
+        if [ "${!arg_idx}" == "${split_cmd_arg[0]}" ] || [ "${!arg_idx}" == "${split_cmd_arg[1]}" ];then
+            case ${cmd_arg_idx} in
+                0) help_panel "${cmd_args[@]}"
+                    ;;
+                1) make_release
+                    ;;
+            esac
+            break
+        elif [ "${!arg_idx}" != "$0" ]; then
+            echo "Entrada '${!arg_idx}' inválida! (cód. 1)"
+            exit 1
+        fi
+    done
 done
