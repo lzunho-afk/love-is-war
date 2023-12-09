@@ -6,6 +6,9 @@
 # um output conforme as necessidades postas, sejam elas atividades de manutenção, teste
 # ou atualização do código fonte em questão.
 
+SCRIPT_DIR=$(realpath $(dirname $0))
+REQS_FILEPATH="${SCRIPT_DIR}/requirements.txt"
+
 function echo() {
     command echo -e "$@"
 }
@@ -43,21 +46,21 @@ fi
 
 PYINST="$PYEXE -m pip install -U"
 
-help_panel() {
+function help_panel() {
     cargs=("$@")
     echo "================"
     echo "PAINEL DE AJUDA:"
     echo "================"
-    echo
     for arg in "${cargs[@]}";do
         IFS=";" read -r -a split_arg <<< "${arg}"
         echo "\t${split_arg[0]}/${split_arg[1]} => ${split_arg[2]}"
     done
+    echo
 }
 
 # build_docs() -- Monta os arquivos para construção da documentação
 # e executa o sphinx para efetivamente construí-la.
-build_docs() {
+function build_docs() {
     proot_pwd=`pwd`
     cd docs/
     sphinx-apidoc -MPfe -o . .. ../setup.py ../loveiswar.py
@@ -65,12 +68,18 @@ build_docs() {
     cd "$proot_pwd"
 }
 
+# install_dependencies() -- Verifica/Atualiza as dependências do projeto.
+function install_dependencies() {
+    echo "[INST_DEPS] Carregando as dependências de '${REQS_FILEPATH}'"
+    $PYINST pip
+    $PYINST -r "$REQS_FILEPATH"
+}
+
 # make_release() -- Realiza o empacotamento da engine para redistribuição de 
 # software conforme necessário - (fazer mais opções no releasing).
-make_release() {
-    # Verificando/Atualizando as dependências
-    $PYINST pip
-    $PYINST -r requirements.txt
+function make_release() {
+    # Atualizando deps.
+    install_dependencies
 
     # Construíndo a documentação
     build_docs
@@ -110,6 +119,8 @@ do
                 0) help_panel "${cmd_args[@]}"
                     ;;
                 1) make_release
+                    ;;
+                2) install_dependencies
                     ;;
             esac
             break
