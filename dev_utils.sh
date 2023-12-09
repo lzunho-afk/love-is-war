@@ -94,6 +94,20 @@ function make_release() {
     cp ./LICENSE ./README.rst ./dist/loveiswar
 }
 
+function clean_docs() {
+    find docs -type f                   \
+        ! -name '[mM]ake*'              \
+        ! -name 'index.rst'             \
+        ! -name 'conf.py'               \
+        ! -path "./docs/_static/*"      \
+        ! -path "./docs/_templates/*"   \
+        -delete
+}
+
+function clean_cache() {
+    find loveiswar -type d -name '__pycache__' -exec rm -r "{}" \;
+}
+
 declare -a cmd_args
 cmd_args[0]="-h;--help;Exibe esse painel de ajuda"
 cmd_args[1]="-r;--release;Realiza um empacotamento com o pyinstaller"
@@ -121,6 +135,12 @@ do
                 1) make_release
                     ;;
                 2) install_dependencies
+                    ;;
+                3) build_docs
+                    ;;
+                4) clean_docs
+                    ;;
+                5) clean_cache
                     ;;
             esac
             break
